@@ -89,16 +89,7 @@ class ReaderUI:
         self.page_total = 0
     
     def calculate_config(self):
-        # 计算提示条长度，保证至少为1，避免窗口过窄导致负值
-        block_width = self.font_hint.measure("█")
-        line_width = self.font_hint.measure("|")
-        space_width = self.font_hint.measure(" ")
-        available_width = self.window_width - 20 - 2 * line_width
-        self.hint_length = max(1, available_width // block_width)
-        self.hint_block_width = block_width
-        self.hint_line_width = line_width
-        self.hint_space_width = max(1, space_width)
-        self.hint_total_width = self.hint_length * block_width
+        self.hint_length = (self.window_width - 20 - self.font_hint.measure("|") * 2) // self.font_hint.measure("█")
     
     def create_widgets(self):
         """创建UI组件"""
@@ -157,13 +148,9 @@ class ReaderUI:
         hint_interger = int(ratio * self.hint_length)
         hint_decimal = int((ratio * hint_unit_length) % 8)
 
-        filled_width = hint_interger * self.hint_block_width
-        if hint_decimal > 0:
-            filled_width += self.font_hint.measure(hint_unit[hint_decimal])
-        remaining_width = max(0, self.hint_total_width - filled_width)
-        empty = remaining_width // self.hint_space_width
+        empty = self.hint_length - hint_interger - (1 if hint_decimal > 0 else 0)
         if hint_decimal == 0:
-            self.hint.config(text=f"|{hint_interger * hint_unit[8]}{' ' * empty}|")
+            self.hint.config(text=f"|{hint_interger * hint_unit[8]}{'\u3000' * empty}|")
         else:
             self.hint.config(text=f"|{hint_interger * hint_unit[8]}{hint_unit[hint_decimal]}{' ' * empty}|")
 

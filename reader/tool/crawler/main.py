@@ -10,9 +10,9 @@ import os, re, sys, time, random, requests, math
 
 tk = Tk()
 
-MAX_THREADS = 3
-MAX_THREADS_DEFAULT = 3
-MAX_THREADS_MAX = 8
+MAX_THREADS = 0
+MAX_THREADS_DEFAULT = 1
+MAX_THREADS_MAX = 1
 "#3C3F43"
 "#90BFF5"
 
@@ -43,7 +43,7 @@ class Crawler:
         )
         # 当被目标站点强力拦截时，允许回退到 cloudscraper（如果已安装）
         self.use_cloudscraper_if_needed = True
-        self.load_ui()
+        self.load_ui_init()
 
     def change_threads(self, delta):
         global MAX_THREADS
@@ -58,7 +58,7 @@ class Crawler:
             self.threads_entry_add.configure(state=NORMAL)
         self.threads_entry.configure(text=MAX_THREADS)
 
-    def load_ui(self):
+    def load_ui_init(self):
         self.font_text = tkfont.Font(family="HYWenHei-85W", size=12)
         self.font_text_small = tkfont.Font(family="HYWenHei-85W", size=10)
         self.font_num = tkfont.Font(family="Jetbrains mono", size=10)
@@ -212,6 +212,8 @@ class Crawler:
         )
         self.threads_entry_max.pack(side="left", pady=0)
 
+        self.change_threads(MAX_THREADS_DEFAULT)
+
         self.status_progress_title = Label(
             self.option_frame,
             text="进度",
@@ -262,13 +264,33 @@ class Crawler:
             bg=self.bbg,
             justify="center",
             relief=FLAT,
-            command=self.ui_launch,
+            command=self.launch_prepare,
         )
         self.start.pack(pady=(40, 0))
+    
+    def launch_prepare(self):
+        self.target_book = self.book_number_entry.get()
+        self.target_chapter = self.book_chapter_entry.get()
+
+        try:
+            self.target_book = int(self.target_book)
+        except ValueError:
+            return
+        
+        try:
+            self.target_chapter = int(self.target_chapter)
+        except ValueError:
+            return
+        
+        self.ui_launch()
+
+    def load_ui_launch(self):
+        pass
 
     def ui_launch(self, x=266):
         if x >= 1024:
             tk.geometry(f"1024x576")
+            self.load_ui_launch()
             return
         tk.geometry(f"{x+8}x576")
         tk.after(5, lambda: self.ui_launch(x + 8))

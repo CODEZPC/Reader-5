@@ -129,3 +129,79 @@
 2026-05-23 21:16:00,747 - INFO - ==========READER LAUNCHED==========
 2026-05-23 21:16:00,748 - INFO - 搜索分卷文件: .\pack\resources.bin*
 2026-05-23 21:16:01,547 - INFO - 解压完成，共 96 个文件
+2026-06-23 17:26:02,369 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:26:02,369 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:26:02,370 - ERROR - 未找到资源包
+2026-06-23 17:26:07,129 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:26:13,046 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:26:13,047 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:26:13,047 - INFO - 尝试读取外部文件
+2026-06-23 17:26:13,107 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:26:13,597 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 5267, 章节数: 1450
+2026-06-23 17:27:48,103 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:27:48,103 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:27:48,103 - ERROR - 未找到资源包
+2026-06-23 17:27:52,656 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:27:54,546 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:27:54,546 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:27:54,547 - INFO - 尝试读取外部文件
+2026-06-23 17:27:54,587 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:27:55,070 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 9989, 章节数: 1450
+2026-06-23 17:28:10,425 - INFO - 正在退出程序...
+2026-06-23 17:28:10,436 - INFO - 程序已退出
+2026-06-23 17:32:54,084 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:32:54,084 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:32:54,084 - ERROR - 未找到资源包
+2026-06-23 17:33:00,108 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:33:01,719 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:33:01,719 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:33:01,719 - INFO - 尝试读取外部文件
+2026-06-23 17:33:01,760 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:33:02,250 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 5267, 章节数: 1450
+2026-06-23 17:34:10,627 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:34:10,627 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:34:10,627 - ERROR - 未找到资源包
+2026-06-23 17:34:15,981 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:34:17,656 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:34:17,656 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:34:17,656 - INFO - 尝试读取外部文件
+2026-06-23 17:34:17,698 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:34:18,180 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 5267, 章节数: 1450
+2026-06-23 17:35:34,734 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:35:34,734 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:35:34,735 - ERROR - 未找到资源包
+2026-06-23 17:35:41,588 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:35:43,508 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:35:43,508 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:35:43,508 - INFO - 尝试读取外部文件
+2026-06-23 17:35:43,550 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:35:44,040 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 5267, 章节数: 1450
+2026-06-23 17:36:08,938 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:36:08,938 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:36:08,939 - ERROR - 未找到资源包
+2026-06-23 17:36:14,134 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:36:16,359 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:36:16,359 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:36:16,359 - INFO - 尝试读取外部文件
+2026-06-23 17:36:16,401 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:36:16,898 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 5267, 章节数: 1450
+2026-06-23 17:36:42,051 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:36:42,051 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:36:42,052 - ERROR - 未找到资源包
+2026-06-23 17:36:49,088 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:36:50,781 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:36:50,781 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:36:50,781 - INFO - 尝试读取外部文件
+2026-06-23 17:36:50,829 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:36:51,321 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 5267, 章节数: 1450
+2026-06-23 17:39:32,423 - INFO - ==========READER LAUNCHED==========
+2026-06-23 17:39:32,424 - INFO - 搜索分卷文件: .\pack\resources.bin*
+2026-06-23 17:39:32,424 - ERROR - 未找到资源包
+2026-06-23 17:39:37,247 - INFO - 开始打开文件: file_path=None, built=False, reload=False
+2026-06-23 17:39:39,001 - INFO - 用户选择了文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt
+2026-06-23 17:39:39,001 - INFO - 开始分页处理: file_path=D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, builtin=False
+2026-06-23 17:39:39,001 - INFO - 尝试读取外部文件
+2026-06-23 17:39:39,044 - INFO - 成功使用编码 utf-8-sig 读取文件
+2026-06-23 17:39:39,534 - INFO - 成功打开文件: D:/codefile/File/FBOOK/书籍bkp/[GM]诡秘之主/GM·诡秘之主.txt, 总页数: 8961, 章节数: 1450
+2026-06-23 17:39:58,084 - INFO - 正在退出程序...
+2026-06-23 17:39:58,097 - INFO - 程序已退出

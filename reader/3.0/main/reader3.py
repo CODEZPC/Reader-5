@@ -710,6 +710,9 @@ class Reader:
                 if not remaining:
                     break
                 line = remaining
+            # 每行之间插入一个空行
+            processed_lines.append("\n")
+            current_processed_count += 1
             self.processed_orginal_lines += 1
             self.conditions["load_speed"] = (
                 self.conditions["load_speed"] * (self.processed_orginal_lines - 1)

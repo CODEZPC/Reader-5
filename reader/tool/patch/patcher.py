@@ -417,7 +417,7 @@ class Patcher:
 
                 self.url = self.find_next(self.soup, self.url)
 
-                time.sleep(0.8)
+                time.sleep(1.2)
 
                 speed_time = time.time() - speed_time
                 avg = (avg * (processed - 1) + speed_time) / processed

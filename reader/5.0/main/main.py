@@ -1,28 +1,7 @@
 """
 Reader 5 - UI
 """
-
-from bs4 import BeautifulSoup
-from threading import Thread
-from tkinter import *
-from tkinter import font as tkfont
-from tkinter import filedialog
-from tkinter import messagebox
-from urllib.parse import urljoin
-import glob
-import logging
-import math
-import os
-import random   
-import re
-import requests
-import struct
-import shutil
-import sys
-import tempfile
-import threading
-import time
-import fake_useragent
+from imports import *
 
 tk = Tk()
 
@@ -82,14 +61,30 @@ class ReaderUI:
         self.color_bg = "#23272E"
         self.color_fg = "#C8C8C8"
         self.color_mid = "#767F89"
+
+        # 预填窗口尺寸，避免 geometry() 触发的首次 Configure 事件重复重建
+        self._last_width = self.window_width
+        self._last_height = self.window_height
     
     def preload_conditions(self):
 
         self.page = 0
         self.page_total = 0
+        self.text_labels = []  # 阅读器显示 Label 列表
+        self._updating = False  # 防重入标志
     
     def calculate_config(self):
         self.hint_length = (self.window_width - 20 - self.font_hint.measure("|") * 2) // self.font_hint.measure("█")
+
+        # 阅读器显示区计算
+        self.line_height = self.font_text.metrics("linespace")  # 单行高度
+        self.label_gap = 5  # Label 间隔
+        self.margin_x = 25  # 左右边距
+        self.margin_top = 45  # 顶部留白（标题下方）
+        self.margin_bottom = 40  # 底部留白（状态栏上方）
+        self.label_width = self.window_width - self.margin_x * 2
+        available_height = self.window_height - self.margin_top - self.margin_bottom
+        self.max_lines = max(1, available_height // (self.line_height + self.label_gap))
     
     def create_widgets(self):
         """创建UI组件"""
@@ -97,6 +92,7 @@ class ReaderUI:
         # 设置窗口基本属性
         tk.title("Reader 5")
         tk.geometry(f"{self.window_width}x{self.window_height}+{(self.screen_width - self.window_width) // 2}+{(self.screen_height - self.window_height) // 2}")
+        tk.minsize(240, 150)
         tk.config(bg=self.color_bg)
 
         self.title = Label(
@@ -113,7 +109,7 @@ class ReaderUI:
             bg=self.color_bg,
             font=self.font_status,
         )
-        self.status.place(x=10, y=665)
+        self.status.place(x=10, y=self.window_height - 35)
 
         self.hint = Label(
             text="",
@@ -121,21 +117,64 @@ class ReaderUI:
             bg=self.color_bg,
             font=self.font_hint,
         )
-        self.hint.place(x=10, y=690)
+        self.hint.place(x=10, y=self.window_height - 22)
+
+        # 创建阅读器显示 Label 列表
+        self.create_text_labels()
 
         tk.bind("<Configure>", self.on_resize)
     
+    def create_text_labels(self):
+        """创建或重建阅读器显示 Label 列表"""
+        self._updating = True  # 防重入：place 子控件会触发父级 Configure
+        try:
+            # 销毁旧 Label
+            for label in self.text_labels:
+                label.destroy()
+            self.text_labels.clear()
+
+            # 按计算出的行数创建新 Label
+            for i in range(self.max_lines):
+                y_pos = self.margin_top + i * (self.line_height + self.label_gap)
+                label = Label(
+                    tk,
+                    text="",
+                    fg=self.color_fg,
+                    bg=self.color_bg,
+                    font=self.font_text,
+                    anchor="w",
+                    justify="left",
+                    wraplength=self.label_width,
+                )
+                label.place(x=self.margin_x, y=y_pos, width=self.label_width, height=self.line_height)
+                self.text_labels.append(label)
+        finally:
+            self._updating = False
+
     def on_resize(self, event):
         """窗口调整大小时重新计算组件位置"""
-        width = tk.winfo_width()
-        height = tk.winfo_height()
-        if width == self.screen_width and height == self.screen_height:
-            return  # 忽略初始配置事件
+        # 忽略非根窗口事件和内部更新触发的伪事件
+        if self._updating or str(event.widget) != str(tk):
+            return
+        width = event.width
+        height = event.height
+        # 忽略初始配置事件和未变化的尺寸
+        if width == self._last_width and height == self._last_height:
+            return
+        self._last_width = width
+        self._last_height = height
         self.window_width = width
         self.window_height = height
 
         # 重新计算
         self.calculate_config()
+
+        # 重建显示 Label
+        self.create_text_labels()
+
+        # 更新底部状态栏位置（相对窗口底部固定）
+        self.status.place_configure(y=height - 35)
+        self.hint.place_configure(y=height - 22)
 
         self.change_hint(self.page, self.page_total)
     

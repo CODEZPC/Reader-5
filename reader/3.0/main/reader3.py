@@ -90,14 +90,14 @@ CONFIG = {
         # "             CUSTOM COMMAND   自定义指令                  ",  # 此选项为开发者模式专用
         "                      About   关于                       ",
         "                    Sponsor   赞助                       ",
-        "                    Restart   重置                       ",
+        "                    Restart   重启                       ",
         "                       Quit   退出                       ",
     ],  # 菜单选项
     "MENU_TITLE": "Menu",  # 菜单标题
     # ===以下为颜色配置=== #
-    "COLOR_TITLE": ["#767F89", "#767F89"],
-    "COLOR_CONTEXT": ["#A4A4A4", "#23272E"],
-    "COLOR_BACKGROUND": ["#23272E", "#DEDEDE"],
+    "COLOR_TITLE": ["#767F89", "#767F89", "#767F89"],
+    "COLOR_CONTEXT": ["#90BFF5","#C8C8C8", "#23272E"],
+    "COLOR_BACKGROUND": ["#23272E","#23272E", "#DEDEDE"],
     "THEME": 0,
 }
 "全局配置"
@@ -329,7 +329,7 @@ class Reader:
 
     def change_color(self):
         global tk
-        CONFIG["THEME"] = 0 if CONFIG["THEME"] == 1 else 1
+        CONFIG["THEME"] = 0 if CONFIG["THEME"] == 2 else CONFIG["THEME"] + 1
         tk.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]])
         self.title.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_TITLE"][CONFIG["THEME"]])
         self.text.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]])
@@ -346,42 +346,26 @@ class Reader:
         tk.attributes("-fullscreen", self.conditions["fullscreen"])
         self.hint.place_forget()
         self.status.place_forget()
-        if not self.conditions["fullscreen"]:
-            # 还原
-            CONFIG["WINDOW_WIDTH"] = DEFAULT["WINDOW_WIDTH"]
-            CONFIG["WINDOW_HEIGHT"] = DEFAULT["WINDOW_HEIGHT"]
-            CONFIG["HINT_LENGTH"] = DEFAULT["HINT_LENGTH"]
-            CONFIG["CHARATERS_PER_LINE"] = DEFAULT["CHARATERS_PER_LINE"]
-            CONFIG["LINES_PER_PAGE"] = DEFAULT["LINES_PER_PAGE"]
-            CONFIG["MENU_WIDTH"] = DEFAULT["MENU_WIDTH"]
-            CONFIG["MENU_HEIGHT"] = DEFAULT["MENU_HEIGHT"]
-            self.status.place(x=10, y=665)
-            self.hint.place(x=10, y=690)
-            self.text.configure(
-                width=CONFIG["CHARATERS_PER_LINE"], height=CONFIG["LINES_PER_PAGE"]
-            )
-            self.menu.configure(
-                width=CONFIG["MENU_WIDTH"], height=CONFIG["MENU_HEIGHT"]
-            )
-            self.open_filet(file_path=self.file_path, built=self.builtin, reload=True)
-        else:
-            # 全屏
+        if self.conditions["fullscreen"]:
             CONFIG["WINDOW_WIDTH"] = CONFIG["INFO_SCREEN_WIDTH"]
             CONFIG["WINDOW_HEIGHT"] = CONFIG["INFO_SCREEN_HEIGHT"]
-            CONFIG["HINT_LENGTH"] = (CONFIG["WINDOW_WIDTH"] - 48) // 16
-            CONFIG["CHARATERS_PER_LINE"] = (CONFIG["WINDOW_WIDTH"] - 80) // 10
-            CONFIG["LINES_PER_PAGE"] = (CONFIG["WINDOW_HEIGHT"] - 100) // 24
-            CONFIG["MENU_WIDTH"] = (CONFIG["WINDOW_WIDTH"] - 80) // 12
-            CONFIG["MENU_HEIGHT"] = int((CONFIG["WINDOW_HEIGHT"] - 100) / 23.84)
-            self.status.place(x=10, y=CONFIG["WINDOW_HEIGHT"] - 55)
-            self.hint.place(x=10, y=CONFIG["WINDOW_HEIGHT"] - 30)
-            self.text.configure(
-                width=CONFIG["CHARATERS_PER_LINE"], height=CONFIG["LINES_PER_PAGE"]
-            )
-            self.menu.configure(
-                width=CONFIG["MENU_WIDTH"], height=CONFIG["MENU_HEIGHT"]
-            )
-            self.open_filet(file_path=self.file_path, built=self.builtin, reload=True)
+        else:
+            CONFIG["WINDOW_WIDTH"] = DEFAULT["WINDOW_WIDTH"]
+            CONFIG["WINDOW_HEIGHT"] = DEFAULT["WINDOW_HEIGHT"]
+        CONFIG["HINT_LENGTH"] = (CONFIG["WINDOW_WIDTH"] - 48) // 16
+        CONFIG["CHARATERS_PER_LINE"] = (CONFIG["WINDOW_WIDTH"] - 80) // 10
+        CONFIG["LINES_PER_PAGE"] = (CONFIG["WINDOW_HEIGHT"] - 100) // 24
+        CONFIG["MENU_WIDTH"] = (CONFIG["WINDOW_WIDTH"] - 80) // 12
+        CONFIG["MENU_HEIGHT"] = int((CONFIG["WINDOW_HEIGHT"] - 100) / 23.84)
+        self.status.place(x=10, y=CONFIG["WINDOW_HEIGHT"] - 55)
+        self.hint.place(x=10, y=CONFIG["WINDOW_HEIGHT"] - 30)
+        self.text.configure(
+            width=CONFIG["CHARATERS_PER_LINE"], height=CONFIG["LINES_PER_PAGE"]
+        )
+        self.menu.configure(
+            width=CONFIG["MENU_WIDTH"], height=CONFIG["MENU_HEIGHT"]
+        )
+        self.open_filet(file_path=self.file_path, built=self.builtin, reload=True)
         tk.focus_force()
 
     def change_menu(self, event, title, option):

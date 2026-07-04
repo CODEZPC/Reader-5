@@ -43,7 +43,7 @@ tk = Tk()
 "tkinter窗口初始化(Reader 对象)"
 
 DEFAULT = {
-    "LINES_PER_PAGE": 26,  # 每页行数 31
+    "LINES_PER_PAGE": 31,  # 每页行数 31
     "CHARATERS_PER_LINE": 120,  # 每行字数 120
     "WINDOW_WIDTH": 1280,  # 窗口宽 1280
     "WINDOW_HEIGHT": 720,  # 窗口高 720
@@ -54,7 +54,7 @@ DEFAULT = {
 "部分默认配置"
 
 CONFIG = {
-    "LINES_PER_PAGE": 26,
+    "LINES_PER_PAGE": 31,
     "CHARATERS_PER_LINE": 120,
     "WINDOW_WIDTH": 1280,
     "WINDOW_HEIGHT": 720,
@@ -87,6 +87,7 @@ CONFIG = {
         "     Download Resource File   下载资源文件                 ",
         " Feedback / Want new books?   意见反馈 / 想要新书？         ",
         # "                     EXPORT   导出                       ",  # 此选项为开发者模式专用
+        # "                    PATCHER   下载                       ",  # 此选项为开发者模式专用
         # "             CUSTOM COMMAND   自定义指令                  ",  # 此选项为开发者模式专用
         "                      About   关于                       ",
         "                    Sponsor   赞助                       ",
@@ -96,13 +97,22 @@ CONFIG = {
     "MENU_TITLE": "Menu",  # 菜单标题
     # ===以下为颜色配置=== #
     "COLOR_TITLE": ["#767F89", "#767F89"],
-    "COLOR_CONTEXT": ["#A4A4A4", "#23272E"],
+    "COLOR_CONTEXT": ["#C8C8C8", "#23272E"],
     "COLOR_BACKGROUND": ["#23272E", "#DEDEDE"],
     "THEME": 0,
 }
 "全局配置"
 
 "----------全局函数区----------"
+
+
+def launch_patcher():
+    "下载器启动"
+    global ptk
+    ptk = Tk()
+    Patcher()
+    mainloop()
+
 
 def merge_and_unpack(prefix: str = ".\\pack\\resources.bin", output_file: str = None):
     """
@@ -370,9 +380,9 @@ class Reader:
             CONFIG["WINDOW_HEIGHT"] = CONFIG["INFO_SCREEN_HEIGHT"]
             CONFIG["HINT_LENGTH"] = (CONFIG["WINDOW_WIDTH"] - 48) // 16
             CONFIG["CHARATERS_PER_LINE"] = (CONFIG["WINDOW_WIDTH"] - 80) // 10
-            CONFIG["LINES_PER_PAGE"] = (CONFIG["WINDOW_HEIGHT"] - 100) // 24
+            CONFIG["LINES_PER_PAGE"] = (CONFIG["WINDOW_HEIGHT"] - 100) // 20
             CONFIG["MENU_WIDTH"] = (CONFIG["WINDOW_WIDTH"] - 80) // 12
-            CONFIG["MENU_HEIGHT"] = int((CONFIG["WINDOW_HEIGHT"] - 100) / 23.84)
+            CONFIG["MENU_HEIGHT"] = (CONFIG["WINDOW_HEIGHT"] - 100) // 24
             self.status.place(x=10, y=CONFIG["WINDOW_HEIGHT"] - 55)
             self.hint.place(x=10, y=CONFIG["WINDOW_HEIGHT"] - 30)
             self.text.configure(
@@ -544,9 +554,14 @@ class Reader:
                 )
                 CONFIG["MENU_OPTIONS"].insert(
                     9,
+                    "                    PATCHER   下载                       ",
+                )
+                CONFIG["MENU_OPTIONS"].insert(
+                    9,
                     "                     EXPORT   导出                       ",
                 )
                 self.func.insert(9, self.custom)
+                self.func.insert(9, launch_patcher)
                 self.func.insert(9, unpack_resources)
                 self.menu.configure(text=CONFIG["EMPTY_TEXT"])
         else:
@@ -610,6 +625,8 @@ class Reader:
             return -1
         # 文件内容
         content = None
+        # 英文字符标记
+        eng_char = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-={}[]|\\:\"';<>?,./`~ ·"
         # 文件读取逻辑
         if not builtin:
             logging.info("尝试读取外部文件")
@@ -632,33 +649,34 @@ class Reader:
             logging.info("处理内置资源内容")
             content = file_path.split("\n")
 
-        try:
-            wrap_font = font.Font(font=self.text.cget("font"))
-        except Exception:
-            wrap_font = font.Font(family="黑体", size=15)
-
-        char_width_cache = {}
-
-        def get_char_width(char):
-            if char not in char_width_cache:
-                char_width_cache[char] = wrap_font.measure(char)
-            return char_width_cache[char]
-
         # 行处理函数
-        def process_line(line, width=CONFIG["WINDOW_WIDTH"] - 80):
-            current_line = line.rstrip("\n")
-            remaining_width = width
+        def process_line(line):
+            current_line = line
+            remaining_length = charaters_per_line
             index_of_char = 0
             for char in current_line:
-                remaining_width -= get_char_width(char)
-                if remaining_width < 0:
-                    if index_of_char == 0:
-                        return current_line[:1] + "\n", current_line[1:]
+                if char == "\n":
+                    return (
+                        current_line[:index_of_char] + " " * remaining_length + "\n",
+                        None,
+                    )
+                remaining_length -= 1 if char in eng_char else 2
+                if remaining_length <= 1:
+                    next_char = (
+                        current_line[index_of_char + 1]
+                        if index_of_char + 1 < len(current_line)
+                        else ""
+                    )
+                    if next_char == "\n" or (
+                        next_char in eng_char and remaining_length == 1
+                    ):
+                        index_of_char += 1
+                        continue
                     new_line = current_line[:index_of_char] + "\n"
                     remaining_content = current_line[index_of_char:]
                     return new_line, remaining_content
                 index_of_char += 1
-            return (current_line + ("\n" if line.endswith("\n") else "")), None
+            return current_line, None
 
         # 主处理循环
         self.processed_orginal_lines = 0
@@ -694,8 +712,8 @@ class Reader:
                     break
                 line = remaining
             # 每行之间插入一个空行
-            processed_lines.append("\n")
-            current_processed_count += 1
+            # processed_lines.append("\n")
+            # current_processed_count += 1
             self.processed_orginal_lines += 1
             self.conditions["load_speed"] = (
                 self.conditions["load_speed"] * (self.processed_orginal_lines - 1)
@@ -754,7 +772,7 @@ class Reader:
             bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
             width=CONFIG["CHARATERS_PER_LINE"],
             height=CONFIG["LINES_PER_PAGE"],
-            font=("HYWenHei-85W", 15),
+            font=("黑体", 15),
             justify="left",
             anchor="nw",
         )
@@ -1136,6 +1154,265 @@ class BinUnpacker:
         if os.path.exists(self.merged_file):
             os.remove(self.merged_file)
             logging.info(f"已清理临时文件: {self.merged_file}")
+
+
+class Patcher:
+    def __init__(self):
+        """主线程初始化"""
+        self.gui_queue = []
+        self.load_ui()
+        ptk.after(100, self.process_gui_updates)
+
+    def process_gui_updates(self):
+        """处理GUI更新队列"""
+        while self.gui_queue:
+            func, args, kwargs = self.gui_queue.pop(0)
+            func(*args, **kwargs)
+        ptk.after(100, self.process_gui_updates)
+
+    def load_ui(self):
+        """UI加载"""
+        ptk.title("Novel Patcher")
+        ptk.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]])
+        self.book = Label(
+            ptk,
+            text="   Book:",
+            font=("Jetbrains Mono", 16),
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+        )
+        self.book.grid(row=1, column=1)
+        self.chapter = Label(
+            ptk,
+            text="Chapter:",
+            font=("Jetbrains Mono", 16),
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+        )
+        self.chapter.grid(row=2, column=1)
+        self.book_input = Entry(
+            ptk,
+            font=("Jetbrains Mono", 16),
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+            relief=RIDGE,
+            width=5,
+        )
+        self.book_input.grid(row=1, column=2)
+        self.chapter_input = Entry(
+            ptk,
+            font=("Jetbrains Mono", 16),
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+            relief=RIDGE,
+            width=8,
+        )
+        self.chapter_input.grid(row=2, column=2)
+        self.start = Button(
+            ptk,
+            text="Start PATCHER",
+            font=("Jetbrains Mono", 16),
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+            relief=RIDGE,
+            width=14,
+            command=self.start_patch,
+        )
+        self.start.grid(row=1, column=3, rowspan=2)
+        self.status = Text(
+            ptk,
+            height=30,
+            font=("Jetbrains Mono", 10),
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+            relief=RIDGE,
+            width=100,
+            state=DISABLED,
+        )
+        self.status.grid(row=3, column=1, columnspan=3)
+        self.status.configure(state=NORMAL)
+        self.status.insert(END, "Novel Patcher 1.0\n")
+        self.status.insert(END, "Not started yet.\n")
+        self.status.configure(state=DISABLED)
+        """空白UI"""
+        self.empty = Label(
+            ptk, text="  ", font=("Jetbrains Mono", 16), bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]]
+        ).grid(row=0, column=0, columnspan=4)
+        self.empty = Label(
+            ptk, text="  ", font=("Jetbrains Mono", 16), bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]]
+        ).grid(row=4, column=0, columnspan=4)
+        self.empty = Label(
+            ptk, text="  ", font=("Jetbrains Mono", 16), bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]]
+        ).grid(row=1, column=0)
+        self.empty = Label(
+            ptk, text="  ", font=("Jetbrains Mono", 16), bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]]
+        ).grid(row=2, column=0)
+        self.empty = Label(
+            ptk, text="  ", font=("Jetbrains Mono", 16), bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]]
+        ).grid(row=1, column=4)
+        self.empty = Label(
+            ptk, text="  ", font=("Jetbrains Mono", 16), bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]]
+        ).grid(row=2, column=4)
+        ptk.resizable(False, False)
+
+    def start_patch(self):
+        try:
+            open(".breakpoint", "r")
+            open(".temp_content", "r")
+        except FileNotFoundError:
+            self.spatch(self.book_input.get(), self.chapter_input.get())
+        else:
+            messagebox.showwarning(
+                "警告",
+                "检测到上次未完成的任务，现在继续会丢失尚未完成的任务，是否继续？",
+            )
+            if messagebox.askyesno("警告", "是否继续？"):
+                os.remove(".breakpoint")
+                os.remove(".temp_content")
+                self.spatch(self.book_input.get(), self.chapter_input.get())
+            else:
+                return
+
+    def spatch(self, book, chapter):
+        """启动爬取"""
+        thread = Thread(target=self.patch, args=(book, chapter))
+        thread.start()
+
+    def safe_gui_update(self, func, *args, **kwargs):
+        """将GUI更新操作放入队列"""
+        self.gui_queue.append((func, args, kwargs))
+
+    def patch(self, book, chapter, continue_patch=False, processed=0):
+        """主要爬取函数"""
+        
+        def update_status(text):
+            self.status.configure(state=NORMAL)
+            self.status.insert(END, text)
+            self.status.configure(state=DISABLED)
+            self.status.see(END)
+            self.status.update()
+        
+        def disable_start():
+            self.start.configure(state=DISABLED)
+            
+        self.safe_gui_update(disable_start)
+        self.safe_gui_update(update_status, f"已启动，解析URL：{chapter}\n")
+
+        """URL解析"""
+        self.url = f"https://www.qidiy.com/book/{book}/{chapter}.html"
+
+        """时间戳记录"""
+        if not continue_patch:
+            self.start_time = time.time()
+
+        self.contents = []
+        try:
+            self.safe_gui_update(update_status, 
+                f"[{int((time.time() - self.start_time)*1000)}]检查临时文件……\n"
+            )
+
+            if continue_patch and os.path.exists(".temp_content"):
+                with open(".temp_content", "r", encoding="utf-8") as f:
+                    self.contents = f.readlines()
+                    os.remove(".temp_content")
+
+            self.next_random_delay = random.randint(5, 12)
+
+            while self.url and not self.url.endswith(f"/book/{book}/"):
+
+                self.safe_gui_update(update_status,
+                    f"[{int((time.time() - self.start_time)*1000)}]生成请求头并提取内容……\n"
+                )
+
+                """请求头"""
+                ua = fake_useragent.UserAgent()
+                self.header = {
+                    "User-Agent": ua.random,
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language": "zh-CN,zh;q=0.8",
+                    "Referer": "http://www.qidiy.com/",
+                }
+                self.response = requests.get(self.url, headers=self.header, timeout=20)
+                self.response.raise_for_status()
+                self.soup = BeautifulSoup(self.response.text, "html.parser")
+                self.content_div = self.soup.find("div", {"id": "content"})
+                if not self.content_div:
+                    messagebox.showerror("错误", "未找到内容")
+                    raise ValueError("未找到内容")
+                    return
+
+                self.safe_gui_update(update_status,
+                    f"[{int((time.time() - self.start_time)*1000)}]解析内容……\n"
+                )
+
+                """内容解析整理"""
+                self.text = self.content_div.get_text()
+                self.text = self.text.replace("　　", "\n")
+                self.text = self.text.replace(" ", "")
+                self.text = re.sub(r" {2,}", "\n", self.text)
+                self.text = self.text.replace("(第1/2页)", "")
+                self.text = self.text.replace("(第2/2页)", "")
+                self.text = self.text.replace("（本章未完，请点击下一页继续阅读）", "")
+                self.text = self.text.strip()
+                self.text = self.text.replace("\n\n", "\n  ")
+                self.text = self.text.replace(" \n", "\n")
+
+                self.safe_gui_update(update_status,
+                    f"[{int((time.time() - self.start_time)*1000)}]检查重复标题……\n"
+                )
+
+                """重复标题移除"""
+                if self.contents and self.url.endswith("/2.html"):
+                    self.text = "\n".join(self.text.split("\n")[1:])
+                self.contents.append(self.text)
+                processed += 1
+
+                self.safe_gui_update(update_status,
+                    f"[{int((time.time() - self.start_time)*1000)}]第{processed}页已解析，当前URL：{self.url}\n"
+                )
+
+                self.url = self.find_next(self.soup, self.url)
+
+                if processed == self.next_random_delay:
+                    delay = 8 + random.random() * 3
+                    # time.sleep(delay)
+                    self.next_random_delay += random.randint(4, 9)
+                else:
+                    delay = 2 + random.random() * 2
+                    # time.sleep(delay)
+
+            self.safe_gui_update(update_status,
+                f"[{int((time.time() - self.start_time)*1000)}]解析完成，开始写入文件……\n"
+            )
+
+            """写入文件"""
+            with open(f"output.txt", "w", encoding="utf-8") as f:
+                f.write("\n".join(self.contents))
+
+            self.safe_gui_update(update_status,
+                f"[{int((time.time() - self.start_time)*1000)}]写入完成，任务完成。\n"
+            )
+            return
+
+        except Exception as e:
+            self.safe_gui_update(update_status,
+                f"[{int((time.time() - self.start_time)*1000)}]爬取失败，正在保存已爬取内容……\n"
+            )
+            with open(".temp_content", "w", encoding="utf-8") as f:
+                f.write("\n".join(self.contents))
+            messagebox.showerror("错误", "爬取失败，请检查网络连接或稍后重试。")
+            logging.error(e)
+            return
+
+    def find_next(self, soup, url):
+        """查找下一页链接"""
+        next_link = soup.find("a", string="下一页")
+        if next_link and "href" in next_link.attrs:
+            return urljoin(url, next_link["href"])
+        next_chapter = soup.find("a", string="下一章")
+        if next_chapter and "href" in next_chapter.attrs:
+            return urljoin(url, next_chapter["href"])
+        return None
 
 
 if __name__ == "__main__":

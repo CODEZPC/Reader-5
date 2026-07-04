@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import font as tkfont
 from tkinter import filedialog
 from tkinter import messagebox
+from tkinter import simpledialog
 from urllib.parse import urljoin
 import glob
 import logging

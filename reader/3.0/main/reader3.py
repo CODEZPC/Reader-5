@@ -1,9 +1,5 @@
 """
 READER 3
-TODOS
-1.添加足量注释
-2.添加LOG输出
-3.拆分长函数
 """
 "----------导入区----------"
 
@@ -76,22 +72,20 @@ CONFIG = {
     # ===以下为菜单显示=== #
     "EMPTY_TEXT": "--- no file open ---\n[ESC]",  # 空文件提示
     "MENU_OPTIONS": [
-        "            Back to reading   返回阅读                    ",
-        "                  Open File   打开文件                    ",
-        "               Turn to Page   转到页码                    ",
-        "                     Reload   重载                       ",
-        "             Built-in Books   内置书籍                    ",
-        "          Generate contents   生成目录                    ",
-        "                 Fullscreen   设置全屏                    ",
-        "               Change color   切换颜色                    ",
-        "     Download Resource File   下载资源文件                 ",
-        " Feedback / Want new books?   意见反馈 / 想要新书？         ",
-        # "                     EXPORT   导出                       ",  # 此选项为开发者模式专用
-        # "             CUSTOM COMMAND   自定义指令                  ",  # 此选项为开发者模式专用
-        "                      About   关于                       ",
-        "                    Sponsor   赞助                       ",
-        "                    Restart   重启                       ",
-        "                       Quit   退出                       ",
+        "返回阅读",
+        "打开文件",
+        "转到页码",
+        "重载",
+        "内置书籍",
+        "生成目录",
+        "设置全屏",
+        "切换颜色",
+        # "导出",  # 此选项为开发者模式专用
+        # "自定义指令",  # 此选项为开发者模式专用
+        "关于",
+        "赞助",
+        "重启",
+        "退出",
     ],  # 菜单选项
     "MENU_TITLE": "Menu",  # 菜单标题
     # ===以下为颜色配置=== #
@@ -252,12 +246,8 @@ class Reader:
             self.generate_contents,
             self.change_full_screen,
             self.change_color,
-            self.gotodownload,
-            lambda: os.system(
-                "start https://github.com/CODEZPC/CODEZPC-novel-reader/issues"
-            ),
             self.about,
-            lambda: os.system("start https://afdian.com/a/CODEZPC"),
+            lambda: os.system("start https://github.com/CODEZPC/CODEZPC/blob/main/README.md"),
             self.restart,
             self.quit,
         ]  # 菜单功能
@@ -269,9 +259,9 @@ class Reader:
         """
         self.book = [
             "CODEZPC's READER\n",
-            "  Version: 4.1\n",
+            "  Version: 4.2\n",
             "  Author: CODEZPC\n",
-            "  Sponsor: https://afdian.com/a/CODEZPC\n",
+            "  Sponsor: https://github.com/CODEZPC/CODEZPC/blob/main/README.md\n",
         ]
         self.conditions["full"] = 1
         self.conditions["now"] = 1
@@ -694,13 +684,6 @@ class Reader:
         if full == 0:
             return -3
         return full, lines, chapter_page, chapter_title
-
-    def gotodownload(self):
-        messagebox.showinfo(
-            "Download",
-            "即将前往下载页面...\n(TIP: 进入后逐个下载可避免支付0.5元的下载费用)",
-        )
-        os.system("start https://www.123684.com/s/XHJUVv-MYtCh")
 
     def load_ui(self):
         """

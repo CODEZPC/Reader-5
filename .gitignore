@@ -1,3 +1,4 @@
 dist*
 wiki
 考试
+__pycache__

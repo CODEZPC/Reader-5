@@ -1,10 +1,7 @@
 """
 READER 3
-TODOS
-1.添加足量注释
-2.添加LOG输出
-3.拆分长函数
 """
+
 "----------导入区----------"
 
 from bs4 import BeautifulSoup
@@ -34,7 +31,10 @@ import fake_useragent
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("reader.log", encoding="utf-8"), logging.StreamHandler()],
+    handlers=[
+        logging.FileHandler("reader.log", encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
 )
 
 "----------全局变量区----------"
@@ -58,8 +58,6 @@ CONFIG = {
     "CHARATERS_PER_LINE": 120,
     "WINDOW_WIDTH": 1280,
     "WINDOW_HEIGHT": 720,
-    "MENU_WIDTH": 100,
-    "MENU_HEIGHT": 25,
     "JUMP_WINDOW_WIDTH": 150,  # 跳转窗口宽 150
     "JUMP_WINDOW_HEIGHT": 40,  # 跳转窗口高 40
     "SELECT_WINDOW_WIDTH": 265,  # 选择窗口宽 265
@@ -74,35 +72,33 @@ CONFIG = {
     "INFO_SCREEN_WIDTH": tk.winfo_screenwidth(),  # 屏幕宽
     "INFO_SCREEN_HEIGHT": tk.winfo_screenheight(),  # 屏幕高
     # ===以下为菜单显示=== #
-    "EMPTY_TEXT": "--- no file open ---\n[ESC]",  # 空文件提示
+    "EMPTY_TEXT": "--- 未打开文件，按ESC以打开菜单 ---",  # 空文件提示
     "MENU_OPTIONS": [
-        "            Back to reading   返回阅读                    ",
-        "                  Open File   打开文件                    ",
-        "               Turn to Page   转到页码                    ",
-        "                     Reload   重载                       ",
-        "             Built-in Books   内置书籍                    ",
-        "          Generate contents   生成目录                    ",
-        "                 Fullscreen   设置全屏                    ",
-        "               Change color   切换颜色                    ",
-        "     Download Resource File   下载资源文件                 ",
-        " Feedback / Want new books?   意见反馈 / 想要新书？         ",
-        # "                     EXPORT   导出                       ",  # 此选项为开发者模式专用
-        # "             CUSTOM COMMAND   自定义指令                  ",  # 此选项为开发者模式专用
-        "                      About   关于                       ",
-        "                    Sponsor   赞助                       ",
-        "                    Restart   重启                       ",
-        "                       Quit   退出                       ",
+        "返回阅读",
+        "打开文件",
+        "转到页码",
+        "重载",
+        "内置书籍",
+        "生成目录",
+        "设置全屏",
+        "切换颜色",
+        # "导出",  # 此选项为开发者模式专用
+        # "自定义指令",  # 此选项为开发者模式专用
+        "关于",
+        "赞助",
+        "重启",
+        "退出",
     ],  # 菜单选项
-    "MENU_TITLE": "Menu",  # 菜单标题
     # ===以下为颜色配置=== #
     "COLOR_TITLE": ["#767F89", "#767F89", "#767F89"],
-    "COLOR_CONTEXT": ["#90BFF5","#C8C8C8", "#23272E"],
-    "COLOR_BACKGROUND": ["#23272E","#23272E", "#DEDEDE"],
+    "COLOR_CONTEXT": ["#90BFF5", "#C8C8C8", "#23272E"],
+    "COLOR_BACKGROUND": ["#23272E", "#23272E", "#DEDEDE"],
     "THEME": 0,
 }
 "全局配置"
 
 "----------全局函数区----------"
+
 
 def merge_and_unpack(prefix: str = ".\\pack\\resources.bin", output_file: str = None):
     """
@@ -252,15 +248,14 @@ class Reader:
             self.generate_contents,
             self.change_full_screen,
             self.change_color,
-            self.gotodownload,
-            lambda: os.system(
-                "start https://github.com/CODEZPC/CODEZPC-novel-reader/issues"
-            ),
             self.about,
-            lambda: os.system("start https://afdian.com/a/CODEZPC"),
+            lambda: os.system(
+                "start https://github.com/CODEZPC/CODEZPC/blob/main/README.md"
+            ),
             self.restart,
             self.quit,
         ]  # 菜单功能
+        tk.bind("<Key>", self.devlop)
         self.load_ui()
 
     def about(self):
@@ -269,9 +264,9 @@ class Reader:
         """
         self.book = [
             "CODEZPC's READER\n",
-            "  Version: 4.1\n",
+            "  Version: 4.2\n",
             "  Author: CODEZPC\n",
-            "  Sponsor: https://afdian.com/a/CODEZPC\n",
+            "  Sponsor: https://github.com/CODEZPC/CODEZPC/blob/main/README.md\n",
         ]
         self.conditions["full"] = 1
         self.conditions["now"] = 1
@@ -295,7 +290,11 @@ class Reader:
         )  # 居中
         self.select.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]])
         empty = Label(
-            self.select, text="", font=("Jetbrains Mono", 5), fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]], bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]]
+            self.select,
+            text="",
+            font=("Jetbrains Mono", 5),
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
         )
         empty.pack()
         dashboard = Listbox(
@@ -331,11 +330,33 @@ class Reader:
         global tk
         CONFIG["THEME"] = 0 if CONFIG["THEME"] == 2 else CONFIG["THEME"] + 1
         tk.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]])
-        self.title.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_TITLE"][CONFIG["THEME"]])
-        self.text.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]])
-        self.status.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]])
-        self.menu.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]])
-        self.hint.configure(bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]], fg=CONFIG["COLOR_TITLE"][CONFIG["THEME"]])
+        self.title.configure(
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_TITLE"][CONFIG["THEME"]],
+        )
+        self.text.configure(
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+        )
+        self.status.configure(
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+        )
+        self.menu_frame.configure(
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+        )
+        for i in self.menu_options:
+            i.configure(
+                bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+                fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+            )
+        self.btn_container.configure(
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+        )
+        self.hint.configure(
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            fg=CONFIG["COLOR_TITLE"][CONFIG["THEME"]],
+        )
         logging.info("颜色改变")
 
     def change_full_screen(self):
@@ -362,31 +383,8 @@ class Reader:
         self.text.configure(
             width=CONFIG["CHARATERS_PER_LINE"], height=CONFIG["LINES_PER_PAGE"]
         )
-        self.menu.configure(
-            width=CONFIG["MENU_WIDTH"], height=CONFIG["MENU_HEIGHT"]
-        )
         self.open_filet(file_path=self.file_path, built=self.builtin, reload=True)
         tk.focus_force()
-
-    def change_menu(self, event, title, option):
-        """
-        显示菜单光标
-
-        :param title: 菜单标题
-        :type title: str
-        :param option: 选项
-        :type option: list -> str
-        :return: 显示的文本
-        :rtype: str
-        """
-        reply = title
-        for i in range(len(option)):
-            if i == self.pin:
-                reply += "\n" + ">  " + option[i] + "  <"
-            else:
-                reply += "\n" + option[i]
-        self.menu.configure(text=reply)
-        return reply
 
     def change_page(self, delta):
         """
@@ -404,10 +402,10 @@ class Reader:
                 self.text.configure(fg=CONFIG["COLOR_TITLE"][CONFIG["THEME"]])
                 tk.bind("<KeyRelease>", self.change_page_ended)
             if self.change_fast >= 50:
-                speed = (self.change_fast - 50) // 30
+                speed = (self.change_fast - 50) // 100
                 speed = int(math.pow(2, speed))
-                if speed >= 32:
-                    speed = 32
+                if speed >= 10:
+                    speed = 10
                 if delta > 0:
                     # 向后翻页，切换到下一章
                     if self.chapter_now < len(self.chapter_name) - speed:
@@ -424,7 +422,9 @@ class Reader:
                     else:
                         self.conditions["now"] = self.conditions["full"]
                         self.chapter_now = len(self.chapter_name) - 1
-                self.title.configure(text=f"×{speed}  " + self.chapter_name[self.chapter_now])
+                self.title.configure(
+                    text=f"×{speed}  " + self.chapter_name[self.chapter_now]
+                )
                 self.update_page(self.conditions["now"], check_chapter=0)
                 self.change_time = time.time()
                 return
@@ -440,7 +440,7 @@ class Reader:
         else:
             self.update_page(self.conditions["now"])
         self.change_time = time.time()
-    
+
     def change_page_ended(self, event):
         """
         切换页结束
@@ -450,41 +450,17 @@ class Reader:
         self.title.configure(text=self.chapter_name[self.chapter_now])
         tk.unbind("<KeyRelease>")
 
-    def change_pin(self, title, option, delta):
-        """
-        改变光标位置
-
-        :param title: 菜单标题
-        :type title: str
-        :param option: 选项
-        :type param: list -> str
-        :param delta: 差
-        :type delta: int
-        """
-        self.pin += delta
-        if self.pin >= len(option):
-            self.pin = 0
-        elif self.pin < 0:
-            self.pin = len(option) - 1
-        self.change_menu(None, title, option)
-
     def close_menu(self, event):
         """
         关闭菜单
         """
         tk.unbind("<Escape>")
-        tk.unbind("<Up>")
-        tk.unbind("<Down>")
-        tk.unbind("<Return>")
         tk.bind("<Escape>", self.open_menu)
         if self.conditions["reading"]:
             tk.bind("<Left>", lambda event: self.change_page(-1))
             tk.bind("<Right>", lambda event: self.change_page(1))
         logging.debug("Close")
-        if self.conditions["reading"]:
-            self.menu.place_forget()
-        else:
-            self.menu.configure(text=CONFIG["EMPTY_TEXT"])
+        self.menu_frame.place_forget()
 
     def custom(self):
         self.custom_bar = Toplevel(tk)
@@ -519,20 +495,20 @@ class Reader:
         if event.char == password[self.dev]:
             self.dev += 1
             if self.dev == 10:
-                tk.unbind("<KeyPress>")
-                CONFIG["EMPTY_TEXT"] = "--- no file open ---\n[ESC]\nDEVLOP MODE ON"
-                CONFIG["MENU_TITLE"] = "Menu [DEVLOP]"
+                tk.unbind("<Key>")
+                CONFIG["EMPTY_TEXT"] = "--- 未打开文件，开发者模式启动 ---"
                 CONFIG["MENU_OPTIONS"].insert(
-                    9,
-                    "             CUSTOM COMMAND   自定义指令                  ",
+                    8,
+                    "自定义指令",
                 )
                 CONFIG["MENU_OPTIONS"].insert(
-                    9,
-                    "                     EXPORT   导出                       ",
+                    8,
+                    "导出",
                 )
-                self.func.insert(9, self.custom)
-                self.func.insert(9, unpack_resources)
-                self.menu.configure(text=CONFIG["EMPTY_TEXT"])
+                self.func.insert(8, self.custom)
+                self.func.insert(8, unpack_resources)
+                self.load_ui()
+                self.text.configure(text=CONFIG["EMPTY_TEXT"])
         else:
             self.dev = 0
 
@@ -578,7 +554,9 @@ class Reader:
         :raise -2: 文件解码失败
         :raise -3: 文件没有内容
         """
-        logging.info(f"开始分页处理: file_path={file_path if not builtin else 'builtin'}, builtin={builtin}")
+        logging.info(
+            f"开始分页处理: file_path={file_path if not builtin else 'builtin'}, builtin={builtin}"
+        )
         logging.debug(f"编码列表: {encodeings}")
         charaters_per_line = CONFIG["CHARATERS_PER_LINE"]
         lines_per_page = CONFIG["LINES_PER_PAGE"]
@@ -695,13 +673,6 @@ class Reader:
             return -3
         return full, lines, chapter_page, chapter_title
 
-    def gotodownload(self):
-        messagebox.showinfo(
-            "Download",
-            "即将前往下载页面...\n(TIP: 进入后逐个下载可避免支付0.5元的下载费用)",
-        )
-        os.system("start https://www.123684.com/s/XHJUVv-MYtCh")
-
     def load_ui(self):
         """
         UI加载
@@ -728,12 +699,12 @@ class Reader:
             text="CODEZPC's READER",
             fg=CONFIG["COLOR_TITLE"][CONFIG["THEME"]],
             bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
-            font=("JetBrains Mono", 15),
+            font=("HYWenHei-85W", 15),
         )
         self.title.place(x=10, y=10)
         # 文本显示
         self.text = Label(
-            text="",
+            text=CONFIG["EMPTY_TEXT"],
             fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
             bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
             width=CONFIG["CHARATERS_PER_LINE"],
@@ -743,16 +714,6 @@ class Reader:
             anchor="nw",
         )
         self.text.place(x=40, y=40)
-        # 菜单
-        self.menu = Label(
-            text=CONFIG["EMPTY_TEXT"],
-            fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
-            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
-            width=CONFIG["MENU_WIDTH"],
-            height=CONFIG["MENU_HEIGHT"],
-            font=("Jetbrains Mono", 15),
-        )
-        self.menu.place(x=40, y=40)
         # 状态栏
         self.status = Label(
             text="",
@@ -769,9 +730,44 @@ class Reader:
             font=("HYWenHei-85W", 12),
         )
         self.hint.place(x=10, y=690)
+        # 菜单
+        self.menu_frame = Frame(
+            tk,
+            bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+            relief=FLAT,
+        )
+        # 顶部弹簧
+        top_spacer = Frame(self.menu_frame)
+        top_spacer.pack(expand=True)
+
+        # 按钮容器 —— 保证按钮垂直居中
+        self.btn_container = Frame(
+            self.menu_frame, bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]]
+        )
+        self.btn_container.pack(expand=False)
+
+        # 菜单按钮
+        self.menu_options = []
+        for i in range(len(CONFIG["MENU_OPTIONS"])):
+            self.menu_options.append(
+                Button(
+                    self.btn_container,
+                    text=CONFIG["MENU_OPTIONS"][i],
+                    fg=CONFIG["COLOR_CONTEXT"][CONFIG["THEME"]],
+                    bg=CONFIG["COLOR_BACKGROUND"][CONFIG["THEME"]],
+                    font=("HYWenHei-85W", 12),
+                    relief=FLAT,
+                    command=self.func[i],
+                )
+            )
+            self.menu_options[-1].pack(side="top", expand=True)
+
+        # 底部弹簧
+        bottom_spacer = Frame(self.menu_frame)
+        bottom_spacer.pack(expand=True)
+
         # 按键绑定
         tk.bind("<Escape>", self.open_menu)
-        tk.bind("<KeyPress>", self.devlop)
 
     def open_file(self, file_path=None, built=False, reload=False):
         """
@@ -784,7 +780,9 @@ class Reader:
         :param reload: 是否为重载，默认为False
         :type reload: bool
         """
-        logging.info(f"开始打开文件: file_path={file_path}, built={built}, reload={reload}")
+        logging.info(
+            f"开始打开文件: file_path={file_path}, built={built}, reload={reload}"
+        )
         if not file_path:
             if reload:
                 logging.info("重载操作，跳过文件选择")
@@ -842,7 +840,9 @@ class Reader:
             self.hint.configure(text="")
             self.status.configure(text="")
         else:
-            logging.info(f"成功打开文件: {file_path}, 总页数: {tmp[0]}, 章节数: {len(tmp[3])}")
+            logging.info(
+                f"成功打开文件: {file_path}, 总页数: {tmp[0]}, 章节数: {len(tmp[3])}"
+            )
             self.file_path = file_path
             self.conditions["now"] = 1
             self.conditions["full"] = tmp[0]
@@ -904,20 +904,14 @@ class Reader:
         """
         if self.conditions["loading"]:
             return
-        self.menu.place_forget()
-        self.menu.place(x=40, y=40)
-        title = CONFIG["MENU_TITLE"]
-        option = CONFIG["MENU_OPTIONS"]
+        self.menu_frame.place_forget()
+        self.menu_frame.place(x=0, y=0, relheight=1, relwidth=1)
         self.pin = 0
         tk.unbind("<Escape>")
         tk.unbind("<Left>")
         tk.unbind("<Right>")
         tk.bind("<Escape>", self.close_menu)
         logging.debug("Open")
-        tk.bind("<Up>", lambda event: self.change_pin(title, option, -1))
-        tk.bind("<Down>", lambda event: self.change_pin(title, option, 1))
-        tk.bind("<Return>", lambda event: self.func[self.pin]())
-        self.change_menu(None, title, option)
 
     def quit(self):
         """
@@ -947,7 +941,9 @@ class Reader:
 
     def save(self):
         target_page = int(self.entry.get())
-        logging.info(f"尝试跳转到页码: {target_page}, 总页数: {self.conditions['full']}")
+        logging.info(
+            f"尝试跳转到页码: {target_page}, 总页数: {self.conditions['full']}"
+        )
         if 1 <= target_page <= self.conditions["full"]:
             logging.info(f"页码验证通过, 跳转到第{target_page}页")
             self.conditions["now"] = target_page
@@ -956,15 +952,9 @@ class Reader:
             self.close_menu(None)
             logging.info(f"成功跳转到第{target_page}页")
         else:
-            logging.warning(f"无效页码: {target_page}, 允许范围: 1-{self.conditions['full']}")
-    
-    def show_chapter(self, event):
-        """
-        显示章节
-        """
-        self.menu.configure(text=self.title.cget('text'))
-        self.menu.place_forget()
-        self.menu.place(x=40, y=40)
+            logging.warning(
+                f"无效页码: {target_page}, 允许范围: 1-{self.conditions['full']}"
+            )
 
     def turn_to_page(self):
         """

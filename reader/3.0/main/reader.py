@@ -327,7 +327,7 @@ class Reader:
         if not self.conditions["reading"] or self.conditions["loading"]:
             return
         if time.time() - self.change_time <= 0.1:
-            limit = len(self.chapter_name) // 100
+            limit = max(len(self.chapter_name) // 100, 1)
             if fast == 1:
                 self.change_fast += 1
             elif fast == 2:

@@ -306,23 +306,41 @@ class Reader:
         self.tk.unbind("<Escape>")
         self.tk.bind("<Escape>", self.open_menu)
         if self.conditions["reading"]:
-            self.tk.bind("<Left>", lambda event: self.change_page(-1))
-            self.tk.bind("<Right>", lambda event: self.change_page(1))
+            self.tk.bind("<Left>", lambda event: self.change_page(-1, 1))
+            self.tk.bind("<Shift-Left>", lambda event: self.change_page(-1, 0))
+            self.tk.bind("<Control-Left>", lambda event: self.change_page(-1, 2))
+            self.tk.bind("<Right>", lambda event: self.change_page(1, 1))
+            self.tk.bind("<Shift-Right>", lambda event: self.change_page(1, 0))
+            self.tk.bind("<Control-Right>", lambda event: self.change_page(1, 2))
         logging.debug("Close")
         self.menu_frame.place_forget()
 
     # ==================== 页码切换 ====================
 
-    def change_page(self, delta):
+    def change_page(self, delta, fast):
         """
         切换页
 
         :param delta: 页码增量（+1 或 -1）
+        :param fast: 0 -> 禁止 | 1 -> 标准 | 2 -> 最快
         """
         if not self.conditions["reading"] or self.conditions["loading"]:
             return
         if time.time() - self.change_time <= 0.1:
-            self.change_fast += 1
+            limit = len(self.chapter_name) // 100
+            if fast == 1:
+                self.change_fast += 1
+            elif fast == 2:
+                self.change_fast = 51
+                speed = limit
+                logging.debug("进入极速翻页模式")
+                self.title.configure(
+                    fg=self.CONFIG["COLOR_CONTEXT"][self.CONFIG["THEME"]]
+                )
+                self.text.configure(
+                    fg=self.CONFIG["COLOR_TITLE"][self.CONFIG["THEME"]]
+                )
+                self.tk.bind("<KeyRelease>", self.change_page_ended)
             if self.change_fast == 50:
                 logging.debug("进入快速翻页模式")
                 self.title.configure(
@@ -333,7 +351,8 @@ class Reader:
                 )
                 self.tk.bind("<KeyRelease>", self.change_page_ended)
             if self.change_fast >= 50:
-                speed = min(int(math.pow(2, (self.change_fast - 50) // 100)), 10)
+                if fast == 1:
+                    speed = min(int(math.pow(2, (self.change_fast - 50) // 100)), limit)
                 if delta > 0:
                     if self.chapter_now < len(self.chapter_name) - speed:
                         self.chapter_now += speed

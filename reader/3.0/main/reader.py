@@ -3,6 +3,7 @@ READER 3 - 核心阅读器模块
 包含 Reader 类及其所有 UI 与阅读逻辑。
 """
 
+import gc
 import logging
 import math
 import os
@@ -698,6 +699,9 @@ class Reader:
         logging.info("重置阅读状态（文件打开失败）")
         self.conditions["reading"] = False
         self.conditions["loading"] = False
+        self.book = []
+        self.chapter_page = []
+        self.chapter_name = []
         self.open_menu(None)
         self.close_menu(None)
         self.hint.configure(text="")
@@ -716,6 +720,12 @@ class Reader:
         if built and hasattr(self, "select"):
             self.select.destroy()
         self.conditions["loading"] = True
+
+        # 释放旧数据，避免新旧数据同时在内存中导致峰值翻倍
+        self.book = []
+        self.chapter_page = []
+        self.chapter_name = []
+        gc.collect()
 
         self.conditions["full"] = 1
         self.conditions["now"] = 1
